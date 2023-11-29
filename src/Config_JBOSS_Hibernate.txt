@@ -1,0 +1,42 @@
+Configurar Banco de Dados PostgresSQL no Servidor JBoss version 17.
+
+1º- Cria-se um modulo dentro da pasta modules no JBoss.
+   Caminho:wildfly-17.0.0.Final\modules\system\layers\base
+	#meuModulo\main
+Dentro desta pasta cria o arquivo camado module.xml e copiar o driver do Postgres version xxxxx.
+#config do xml.
+---------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="meuModulo" xmlns="urn:jboss:module:1.5">
+    <resources>
+        <resource-root path="postgresql-42.6.0.jar"/>
+    </resources>
+    <dependencies>
+        <module name="javax.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="javax.servlet.api" optional="true"/>
+    </dependencies>
+</module>
+-----------------------------------------------------------------------------------------------------------------
+#config do Standalone.xml
+#dentro da tag <datasources></datasources>
+<datasource jndi-name="java:jboss/datasources/PostgresDS" pool-name="PostgresDS" enabled="true" use-java-context="true">
+          <connection-url>jdbc:postgresql://localhost:5432/test</connection-url>
+          <driver>postgres</driver>
+          <security>
+            <user-name>postgres</user-name>
+            <password>admin</password>
+          </security>
+</datasource>
+# dentro da tag <drivers></drivers>
+<driver name="postgres" module="org.postgreSQL">
+            <driver-class>org.postgresql.Driver</driver-class>
+</driver>
+
+#config Database default
+<default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/PostgresDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default" />
+
+# Para execudar o servidor Jboss sem IDE 
+Dentro da pasta bin, executar o arquivo standalone.bat para windows ou .sh para linux ou mac
+
+***obs o nome do modulo é o caminho ex: com.teste.mybase
